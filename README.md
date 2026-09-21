@@ -2,6 +2,8 @@
 
 独立的静态 Web App。打开后从空白计划开始，适合自行安排任何课程或项目。无需注册，记录保存在当前浏览器。
 
+[打开 Web App](https://done1314.github.io/everyone-review-plan/)
+
 ## 使用
 
 1. 在“设置”中修改计划名称。
