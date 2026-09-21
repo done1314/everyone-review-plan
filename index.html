@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f2f2f7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="我的复习计划" />
+  <title>我的复习计划</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="scroll-edge" aria-hidden="true"></div>
+
+  <header class="topbar glass">
+    <button class="icon-button" id="todayShortcut" aria-label="回到今天">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M17 3h4v4"/></svg>
+    </button>
+    <div class="brand" id="brandName"><img src="icon-192.png" alt="" /><span>我的复习计划</span></div>
+    <button class="icon-button" id="openSettings" aria-label="设置">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.16.38.37.72.6 1 .28.25.66.39 1.1.4h.1v4h-.1a1.7 1.7 0 0 0-1.7.6Z"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="view active" id="todayView" aria-labelledby="todayTitle">
+      <div class="hero">
+        <p class="eyebrow" id="fullDate"></p>
+        <h1 id="todayTitle">今天，稳稳向前。</h1>
+        <div class="hero-progress">
+          <div class="progress-ring" id="progressRing" role="img" aria-label="今日完成进度">
+            <span id="progressValue">0%</span>
+          </div>
+          <p id="progressMessage">完成两项日课，就算赢下今天。</p>
+        </div>
+      </div>
+
+      <div class="date-strip" id="dateStrip" aria-label="选择日期"></div>
+      <div class="calendar-actions"><button id="backToToday" hidden><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>回到今天</button></div>
+
+      <section class="section-block" aria-labelledby="taskHeading">
+        <div class="section-heading">
+          <h2 id="taskHeading">今日任务</h2>
+          <span id="totalDuration">共 120 分钟</span>
+        </div>
+        <button class="rest-button" id="restToday" hidden><span>☕</span><strong>今天休息</strong><small>未完成任务将顺延一天</small></button>
+        <div id="taskList"></div>
+      </section>
+
+      <aside class="note-card">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-4 12.75V18h8v-3.25A7 7 0 0 0 12 2Z"/><path d="M9 22h6M9 18h6"/></svg>
+        <div><strong>完成标准</strong><p>上传当天的学习笔记、练习或阅读批注，再完成打卡。照片仅保存在当前浏览器。</p></div>
+      </aside>
+    </section>
+
+    <section class="view" id="planView" aria-labelledby="planTitle">
+      <div class="page-head">
+        <p class="eyebrow">学习路径</p>
+        <h1 id="planTitle">天数由你，节奏由你。</h1>
+        <p>添加任务，按根目录和子目录安排天数。每天的学习内容会自动排进计划。</p>
+      </div>
+      <div class="plan-summary" id="planSummary"></div>
+      <div class="section-heading catalog-heading"><h2>学习任务与目录</h2><button class="add-task-button" id="openAddTask"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>添加任务</button></div>
+      <div class="plan-task-list" id="planTaskList"></div>
+    </section>
+
+    <section class="view" id="progressView" aria-labelledby="progressTitle">
+      <div class="page-head">
+        <p class="eyebrow">学习记录</p>
+        <h1 id="progressTitle">坚持，会被看见。</h1>
+        <p>所有数据只保存在这台设备的浏览器中。</p>
+      </div>
+      <div class="progress-toolbar">
+        <div class="period-tabs" id="periodTabs"><button class="active" data-period="day">日</button><button data-period="week">周</button><button data-period="month">月</button></div>
+        <div class="period-nav"><button id="progressPrev" aria-label="上一时间段">‹</button><input id="progressDate" type="date" aria-label="统计日期" /><button id="progressNext" aria-label="下一时间段">›</button></div>
+      </div>
+      <section class="focus-card" aria-labelledby="focusChartTitle">
+        <div class="section-heading"><h2 id="focusChartTitle">分类专注</h2><span id="focusRange"></span></div>
+        <div class="pie-layout">
+          <div class="focus-pie" id="focusPie" role="img" aria-label="分类专注时间饼图"><div><strong id="focusTotal">0</strong><span>分钟</span></div></div>
+          <div class="focus-legend" id="focusLegend"></div>
+        </div>
+        <p class="pie-detail" id="pieDetail">完成任务后，这里会按分类统计专注时间。</p>
+      </section>
+      <div class="stats-grid" id="statsGrid"></div>
+      <section class="section-block history-block">
+        <div class="section-heading"><h2>最近专注</h2></div>
+        <div class="history-list" id="historyList"></div>
+      </section>
+    </section>
+  </main>
+
+  <nav class="tabbar glass" aria-label="主导航">
+    <button class="tab active" data-view="todayView" aria-current="page"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></svg><span>今天</span></button>
+    <button class="tab" data-view="planView"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01"/></svg><span>计划</span></button>
+    <button class="tab" data-view="progressView"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/></svg><span>进度</span></button>
+  </nav>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+  <section class="sheet" id="durationSheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+    <div class="grabber"></div>
+    <div class="sheet-bar"><button class="text-button" data-close-sheet>取消</button><h2 id="sheetTitle">设置时长</h2><button class="text-button strong" id="saveDuration">完成</button></div>
+    <div class="sheet-body">
+      <p id="durationSubject"></p>
+      <label class="duration-input"><input id="durationInput" type="number" min="5" max="480" step="5" inputmode="numeric" /><span>分钟</span></label>
+      <div class="preset-row" id="presetRow"><button>25</button><button>30</button><button>45</button><button>60</button><button>90</button></div>
+    </div>
+  </section>
+
+  <section class="sheet focus-sheet" id="focusSheet" role="dialog" aria-modal="true" aria-labelledby="focusSheetTitle" hidden>
+    <div class="grabber"></div>
+    <div class="sheet-bar"><button class="text-button" id="closeFocus">关闭</button><h2 id="focusSheetTitle">番茄专注</h2><span></span></div>
+    <div class="sheet-body">
+      <p id="focusSubject"></p>
+      <div class="timer-ring" id="timerRing"><div><strong id="timerValue">25:00</strong><span id="timerStatus">准备专注</span></div></div>
+      <div class="timer-actions"><button class="timer-secondary" id="resetFocus">重置</button><button class="timer-primary" id="toggleFocus">开始专注</button><button class="timer-secondary" id="finishFocus">结束并记录</button></div>
+      <p class="timer-hint">专注记录按实际时长计入当天的分类统计。</p>
+    </div>
+  </section>
+
+  <section class="sheet" id="settingsSheet" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+    <div class="grabber"></div>
+    <div class="sheet-bar"><button class="text-button" data-close-sheet>取消</button><h2 id="settingsTitle">计划设置</h2><button class="text-button strong" id="saveSettings">完成</button></div>
+    <div class="sheet-body settings-body">
+      <label>计划名称<span><input class="wide-input" id="planName" type="text" maxlength="24" placeholder="例如：小王的复习计划" /></span></label>
+      <p>计划名称会显示在应用顶部。每个任务可分别设置开始日期、学习目录和专注时长。</p>
+      <button class="install-button" id="installApp"><img src="icon-192.png" alt="" /><span><strong>添加到桌面</strong><small>安装为独立 Web App</small></span><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 19h14"/></svg></button>
+      <p class="install-hint" id="installHint" hidden></p>
+    </div>
+  </section>
+
+  <section class="sheet" id="taskSheet" role="dialog" aria-modal="true" aria-labelledby="taskSheetTitle" hidden>
+    <div class="grabber"></div>
+    <div class="sheet-bar"><button class="text-button" data-close-sheet>取消</button><h2 id="taskSheetTitle">添加任务</h2><button class="text-button strong" id="saveTask">完成</button></div>
+    <div class="sheet-body form-body">
+      <label class="form-field"><span>任务名称</span><input id="customTitle" type="text" maxlength="40" placeholder="例如：背单词" /></label>
+      <label class="form-field"><span>任务分类</span><input id="customCategory" type="text" maxlength="12" list="categoryOptions" placeholder="例如：专业课" /></label>
+      <datalist id="categoryOptions"><option value="数学"></option><option value="英语"></option><option value="政治"></option><option value="专业课"></option><option value="其他"></option></datalist>
+      <label class="form-field"><span>开始日期</span><input id="customStartDate" type="date" /></label>
+      <div class="outline-total" id="taskTotalDays">计划共 0 天</div>
+      <label class="form-field"><span>专注时长</span><span class="input-unit"><input id="customDuration" type="number" min="5" max="480" step="5" value="30" /> 分钟</span></label>
+      <div class="outline-label"><strong>学习目录</strong><button type="button" id="addTaskRoot">＋ 添加根目录</button></div>
+      <div class="outline-editor" id="taskOutline"></div>
+      <p class="field-error" id="taskError" hidden></p>
+      <button class="delete-task" id="deleteTask" hidden>删除任务</button>
+    </div>
+  </section>
+
+  <section class="sheet" id="catalogSheet" role="dialog" aria-modal="true" aria-labelledby="catalogSheetTitle" hidden>
+    <div class="grabber"></div>
+    <div class="sheet-bar"><button class="text-button" data-close-sheet>取消</button><h2 id="catalogSheetTitle">编辑学习目录</h2><button class="text-button strong" id="saveCatalog">完成</button></div>
+    <div class="sheet-body form-body">
+      <p id="catalogSubject"></p>
+      <div class="outline-label"><strong>根目录与子目录</strong><button type="button" id="addCatalogRoot">＋ 添加根目录</button></div>
+      <div class="outline-editor" id="catalogOutline"></div>
+      <p class="field-error" id="catalogError" hidden></p>
+      <p class="catalog-help">根目录按顺序学习。子目录的天数之和需等于所属根目录天数。</p>
+    </div>
+  </section>
+
+  <template id="taskTemplate">
+    <article class="task-card">
+      <div class="task-top">
+        <div class="subject-icon"></div>
+        <div class="task-copy"><p class="subject-label"></p><h3></h3><p class="task-detail"></p></div>
+        <button class="duration-pill" aria-label="设置任务时长"></button>
+      </div>
+      <div class="proof-area">
+        <button class="focus-button"><span>🍅</span><strong>开始番茄专注</strong><small></small></button>
+        <input class="photo-input" type="file" accept="image/*" capture="environment" hidden />
+        <button class="upload-button"><svg viewBox="0 0 24 24"><path d="M4 7h3l1.5-2h7L17 7h3v12H4Z"/><circle cx="12" cy="13" r="4"/></svg><span>拍照上传</span></button>
+        <div class="proof-preview" hidden><img alt="学习内容证明"/><div><strong>照片已添加</strong><span class="proof-name"></span></div><button class="replace-proof">更换</button></div>
+        <button class="complete-button" disabled>上传照片后打卡</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
