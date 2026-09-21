@@ -69,6 +69,13 @@ function taskData(date=selectedDate){return seriesDefinitions().map(series=>task
 function durationFor(task){return state.durations[task.itemId]??task.defaultDuration??30;}
 function completionFor(task){return state.completed[task.itemId];}
 function completedEntries(){return Object.entries(state.completed).filter(([,entry])=>entry&&typeof entry==='object'&&entry.completedDate);}
+function completedOnDate(date,scheduledTasks){
+  const scheduledIds=new Set(scheduledTasks.map(task=>task.itemId)),seriesById=new Map(seriesDefinitions().map(series=>[series.id,series]));
+  return completedEntries().filter(([itemId,entry])=>entry.completedDate===date&&entry.plannedDate!==date&&!scheduledIds.has(itemId)).map(([itemId,entry])=>{
+    const series=seriesById.get(entry.seriesId),category=entry.category||series?.category||'其他';
+    return {itemId,id:entry.seriesId,index:entry.index,kind:series?.kind||'custom',category,title:entry.title||'已完成任务',detail:`原计划 ${entry.plannedDate?formatDate(entry.plannedDate):'未来日期'} · 当天已打卡`,label:`${category} · 提前完成`,defaultDuration:entry.minutes||series?.defaultDuration||30};
+  });
+}
 
 function renderDateStrip(){
   const wrap=document.querySelector('#dateStrip');wrap.innerHTML='';
@@ -82,10 +89,13 @@ function renderToday(){
   document.querySelector('#backToToday').hidden=selectedDate===today;
   const rest=document.querySelector('#restToday'),hasCompletedToday=completedEntries().some(([,entry])=>entry.plannedDate===today);
   rest.hidden=selectedDate!==today||(!state.restDays[today]&&hasCompletedToday);rest.classList.toggle('resting',Boolean(state.restDays[today]));rest.querySelector('strong').textContent=state.restDays[today]?'取消今天休息':'今天休息';rest.querySelector('small').textContent=state.restDays[today]?'恢复今天原有任务':'未完成任务将顺延一天';
-  const tasks=taskData(),list=document.querySelector('#taskList');list.innerHTML='';if(tasks.length)tasks.forEach(renderTask);else list.innerHTML=`<div class="custom-empty">${state.restDays[selectedDate]?'今天已设为休息日，任务已顺延。':'这一天还没有任务。可在“计划”中添加任务或调整开始日期。'}</div>`;
-  const total=tasks.reduce((sum,task)=>sum+durationFor(task),0),complete=tasks.filter(completionFor).length,percent=tasks.length?Math.round(complete/tasks.length*100):0;
-  document.querySelector('#totalDuration').textContent=tasks.length?`共 ${total} 分钟`:'轻松一天';document.querySelector('#progressValue').textContent=`${percent}%`;document.querySelector('#progressRing').style.setProperty('--p',`${percent*3.6}deg`);
-  document.querySelector('#progressMessage').textContent=state.restDays[selectedDate]?'休息也是计划的一部分。':!tasks.length?'今天没有安排，留一点空间给自己。':complete===tasks.length?'今日任务已完成。去好好休息吧。':complete?`已完成 ${complete} / ${tasks.length} 项，继续保持。`:`完成今天的 ${tasks.length} 项任务，就算赢下今天。`;
+  const tasks=taskData(),earlyCompleted=completedOnDate(selectedDate,tasks),list=document.querySelector('#taskList');list.innerHTML='';
+  if(tasks.length)tasks.forEach(renderTask);
+  if(earlyCompleted.length){const heading=document.createElement('div');heading.className='early-completed-heading';heading.textContent='当天提前完成';list.append(heading);earlyCompleted.forEach(renderTask);}
+  if(!tasks.length&&!earlyCompleted.length)list.innerHTML=`<div class="custom-empty">${state.restDays[selectedDate]?'今天已设为休息日，任务已顺延。':'这一天还没有任务。可在“计划”中添加任务或调整开始日期。'}</div>`;
+  const visibleTasks=[...tasks,...earlyCompleted],total=visibleTasks.reduce((sum,task)=>sum+durationFor(task),0),complete=visibleTasks.filter(completionFor).length,percent=visibleTasks.length?Math.round(complete/visibleTasks.length*100):0;
+  document.querySelector('#totalDuration').textContent=visibleTasks.length?`共 ${total} 分钟`:'轻松一天';document.querySelector('#progressValue').textContent=`${percent}%`;document.querySelector('#progressRing').style.setProperty('--p',`${percent*3.6}deg`);
+  document.querySelector('#progressMessage').textContent=state.restDays[selectedDate]?'休息也是计划的一部分。':!visibleTasks.length?'今天没有安排，留一点空间给自己。':complete===visibleTasks.length?'今日任务已完成。去好好休息吧。':complete?`已完成 ${complete} / ${visibleTasks.length} 项，继续保持。`:`完成今天的 ${visibleTasks.length} 项任务，就算赢下今天。`;
 }
 function renderTask(task){
   const node=document.querySelector('#taskTemplate').content.firstElementChild.cloneNode(true),proof=state.proofs[task.itemId],done=completionFor(task);node.classList.add(task.kind);if(done)node.classList.add('completed');node.querySelector('.subject-icon').innerHTML=icons[task.kind];node.querySelector('.subject-label').textContent=task.label;node.querySelector('h3').textContent=task.title;node.querySelector('.task-detail').textContent=task.detail;
